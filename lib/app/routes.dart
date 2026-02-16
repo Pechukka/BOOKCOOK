@@ -1,41 +1,27 @@
 import 'package:flutter/material.dart';
+import '../screens/auth/login_screen.dart';
+import '../screens/auth/register_screen.dart';
+import '../screens/home/home_screen.dart';
+import '../screens/recipes/recipe_add_screen.dart';
+import '../screens/recipes/recipe_detail_screen.dart';
+import '../screens/ingredients/ingredient_scanner_screen.dart';
 
 class AppRoutes {
-
-  // ─────────────────────────────────────────────
-  // Nombres de rutas
-  // ─────────────────────────────────────────────
-  static const String login = '/login';
+  static const String login = '/';
   static const String register = '/register';
   static const String home = '/home';
+  static const String addRecipe = '/addRecipe';
+  static const String recipeDetail = '/recipeDetail';
+  static const String scanner = '/scanner';
 
-  static const String recipeList = '/recipes';
-  static const String recipeAdd = '/recipes/add';
-  static const String recipeDetail = '/recipes/detail';
-
-  static const String ingredientList = '/ingredients';
-  static const String ingredientScanner = '/ingredients/scanner';
-  static const String ingredientDetail = '/ingredients/detail';
-  static const String ingredientEdit = '/ingredients/edit';
-
-
-  // ─────────────────────────────────────────────
-  // Mapa de rutas
-  // ─────────────────────────────────────────────
-  static Map<String, WidgetBuilder> get routes {
+  static Map<String, WidgetBuilder> getRoutes() {
     return {
-      login: (_) => const Placeholder(),
-      register: (_) => const Placeholder(),
-      home: (_) => const Placeholder(),
-
-      recipeList: (_) => const Placeholder(),
-      recipeAdd: (_) => const Placeholder(),
-      recipeDetail: (_) => const Placeholder(),
-
-      ingredientList: (_) => const Placeholder(),
-      ingredientScanner: (_) => const Placeholder(),
-      ingredientDetail: (_) => const Placeholder(),
-      ingredientEdit: (_) => const Placeholder(),
+      login: (context) => const LoginScreen(),
+      register: (context) => const RegisterScreen(),
+      home: (context) => const HomeScreen(),
+      addRecipe: (context) => const RecipeAddScreen(),
+      recipeDetail: (context) => const RecipeDetailScreen(),
+      scanner: (context) => const IngredientScannerScreen(),
     };
   }
 }
