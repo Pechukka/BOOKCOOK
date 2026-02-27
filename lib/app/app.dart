@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'theme.dart';
 import 'routes.dart';
+import 'theme.dart';
 
 class BookCookApp extends StatelessWidget {
   const BookCookApp({super.key});
@@ -8,11 +8,21 @@ class BookCookApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+
+      // ── TITULO ──
       title: 'BookCook',
-      theme: AppTheme.lightTheme,
+
+      // ── QUITAMOS ETIQUETA DEBUG ──
       debugShowCheckedModeBanner: false,
+
+      // ── TEMA ──
+      theme: AppTheme.lightTheme,
+
+      // ── RUTA INICIAL ──
       initialRoute: AppRoutes.login,
-      routes: AppRoutes.getRoutes(),
+
+      // ── RUTAS ──
+      routes: AppRoutes.routes,
     );
   }
 }

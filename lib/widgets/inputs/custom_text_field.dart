@@ -1,67 +1,49 @@
 import 'package:flutter/material.dart';
 
 class CustomTextField extends StatelessWidget {
-  final String label;
-  final String hintText;
-  final TextEditingController controller;
-  final bool obscureText;
-  final IconData? prefixIcon;
-  final TextInputType? keyboardType;
+
+  final String label;                     // "Email", "Password", "Name"...
+  final String hint;                      // texto gris dentro del campo
+  final IconData prefixIcon;              // icono a la izquierda
+  final TextEditingController controller; // controlador
+  final bool isPassword;                  // boolean para ocultar contenido o no
+  final TextInputType keyboardType;       // tipo de teclado (numerico, texto, con @...)
 
   const CustomTextField({
     super.key,
     required this.label,
-    required this.hintText,
+    required this.hint,
+    required this.prefixIcon,
     required this.controller,
-    this.obscureText = false,
-    this.prefixIcon,
-    this.keyboardType,
+
+    // opcionales
+    this.isPassword = false,
+    this.keyboardType = TextInputType.text,
   });
 
   @override
   Widget build(BuildContext context) {
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+
+        // LABEL
         Text(
           label,
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-            color: Theme.of(context).colorScheme.primary,
-          ),
+          style: Theme.of(context).textTheme.labelMedium,
         ),
+
         const SizedBox(height: 8),
+
+        // CAMPO DE TEXTO
         TextField(
           controller: controller,
-          obscureText: obscureText,
+          obscureText: isPassword,
           keyboardType: keyboardType,
           decoration: InputDecoration(
-            hintText: hintText,
-            prefixIcon: prefixIcon != null
-                ? Icon(prefixIcon, size: 20, color: Colors.grey)
-                : null,
-            filled: true,
-            fillColor: Colors.white,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide.none,
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide.none,
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(
-                color: Theme.of(context).colorScheme.primary,
-                width: 1,
-              ),
-            ),
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 16,
-            ),
+            hintText: hint,
+            prefixIcon: Icon(prefixIcon),
           ),
         ),
       ],

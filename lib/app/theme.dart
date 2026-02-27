@@ -1,62 +1,96 @@
 import 'package:flutter/material.dart';
 
 class AppTheme {
-  static const Color primary = Color(0xFF8B6F47);
-  static const Color background = Color(0xFFF5F1E8);
-  static const Color secondary = Color(0xFFBE9678);
-  static const Color accent = Color(0xFFA2B59C);
-  static const Color surface = Color(0xFFEFE8DC);
+  // ─────────────────────────────────────────────────────────
+  // COLORES BASE
+  // ─────────────────────────────────────────────────────────
+  static const Color _primaryColor    = Color(0xFF8B6914); // café dorado
+  static const Color _backgroundColor = Color(0xFFF5F0E8); // crema papel
+  static const Color _surfaceColor    = Color(0xFFEDE8DB); // tarjetas
+  static const Color _textPrimary     = Color(0xFF3D2B0A); // texto oscuro
+  static const Color _textSecondary   = Color(0xFF8C7B5E); // texto suave
+  static const Color _borderColor     = Color(0xFFD9D0BF); // bordes
 
+  // ─────────────────────────────────────────────────────────
+  // TEMA PRINCIPAL
+  // ─────────────────────────────────────────────────────────
   static ThemeData get lightTheme {
     return ThemeData(
-      useMaterial3: true,
+      
+      // ── ColorScheme ──
       colorScheme: ColorScheme.light(
-        primary: primary,
-        secondary: secondary,
-        surface: surface,
-        background: background,
+        primary:   _primaryColor,
+        surface:   _surfaceColor,
+        onPrimary: Colors.white,
+        onSurface: _textPrimary,
       ),
-      scaffoldBackgroundColor: background,
-      appBarTheme: const AppBarTheme(
-        backgroundColor: primary,
-        foregroundColor: Colors.white,
-        elevation: 0,
-        centerTitle: true,
+
+      // El fondo de cada pantalla
+      scaffoldBackgroundColor: _backgroundColor,
+
+      // ── TextTheme ──
+      textTheme: const TextTheme(
+        headlineLarge: TextStyle(
+          fontSize: 32,
+          fontWeight: FontWeight.bold,
+          color: _primaryColor,
+          letterSpacing: 0.5,
+        ),
+        bodyMedium: TextStyle(
+          fontSize: 14,
+          color: _textSecondary,
+        ),
+        labelMedium: TextStyle(
+          fontSize: 13,
+          fontWeight: FontWeight.w500,
+          color: _textPrimary,
+        ),
       ),
+
+      // ── InputDecorationTheme ──
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: Colors.white,
+        fillColor: _surfaceColor,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 14,
+        ),
+
+        // border normal (sin foco y sin error)
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide.none,
+          borderSide: const BorderSide(color: _borderColor),
         ),
+
+        // border cuando el campo está inactivo
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide.none,
+          borderSide: const BorderSide(color: _borderColor),
         ),
+
+        // border cuando el usuario está escribiendo en el campo
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: primary, width: 1),
+          borderSide: const BorderSide(color: _primaryColor, width: 1.5),
         ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        hintStyle: const TextStyle(color: _textSecondary, fontSize: 14),
+        iconColor: _textSecondary,
       ),
+
+      // ── ElevatedButtonTheme ──
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: primary,
+          backgroundColor: _primaryColor,
           foregroundColor: Colors.white,
+          minimumSize: const Size(double.infinity, 52),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(14),
           ),
-          padding: const EdgeInsets.symmetric(vertical: 16),
           elevation: 0,
-        ),
-      ),
-      cardTheme: CardThemeData(
-        color: Colors.white,
-        elevation: 2,
-        shadowColor: Colors.black.withValues(alpha: 0.05),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
+          textStyle: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+          ),
         ),
       ),
     );

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class RegisterScreen extends StatelessWidget {
-  const RegisterScreen({super.key});
+class IngredientConfirmScreen extends StatelessWidget {
+  const IngredientConfirmScreen({super.key});
   @override
   Widget build(BuildContext context) {
     return const Scaffold(
