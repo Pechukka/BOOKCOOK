@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../app/routes.dart';
+import '../../services/auth_service.dart';
 import '../../widgets/buttons/primary_button.dart';
 import '../../widgets/common/logo_header.dart';
 import '../../widgets/inputs/custom_text_field.dart';
@@ -13,9 +14,13 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
 
-  // ── CONTROLLERS ──
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _auth = AuthService.instance;
+
+  bool _isLoading = false;
+
+  String? _errorMessage;
 
   @override
   void dispose() {
@@ -24,53 +29,57 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  // ── MÉTODOS DE NAVEGACIÓN ──
-  void _onLoginPressed() {
-    Navigator.pushReplacementNamed(context, AppRoutes.home);
+  Future<void> _onLogin() async {
+    // Ocultamos el teclado
+    FocusScope.of(context).unfocus();
+
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    final error = await _auth.login(
+      email: _emailController.text,
+      password: _passwordController.text,
+    );
+
+    if (!mounted) return;
+
+    if (error != null) {
+      setState(() {
+        _errorMessage = error;
+        _isLoading = false;
+      });
+    } else {
+      Navigator.pushReplacementNamed(context, AppRoutes.home);
+    }
   }
 
-  void _onGoToRegister() {
-    Navigator.pushNamed(context, AppRoutes.register);
-  }
-
-  // ── BUILD ──
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
-
-          padding: const EdgeInsets.symmetric(
-            horizontal: 28,
-            vertical: 24,
-          ),
-
+          padding: const EdgeInsets.all(24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
 
               const SizedBox(height: 40),
-
-              
               const LogoHeader(
                 subtitle: 'Your personal recipe book',
               ),
-
               const SizedBox(height: 48),
 
-              
               CustomTextField(
                 label: 'Email',
                 hint: 'your@email.com',
-                prefixIcon: Icons.mail_outline_rounded,
+                prefixIcon: Icons.email_outlined,
                 controller: _emailController,
                 keyboardType: TextInputType.emailAddress,
               ),
+              const SizedBox(height: 16),
 
-              const SizedBox(height: 20),
-
-              
               CustomTextField(
                 label: 'Password',
                 hint: '••••••••',
@@ -78,30 +87,52 @@ class _LoginScreenState extends State<LoginScreen> {
                 controller: _passwordController,
                 isPassword: true,
               ),
+              const SizedBox(height: 12),
 
-              const SizedBox(height: 32),
-
-              
-              PrimaryButton(
-                text: 'Log In',
-                onPressed: _onLoginPressed,
-              ),
-
-              const SizedBox(height: 24),
-
-              GestureDetector(
-                onTap: _onGoToRegister,
-                child: Text(
-                  "Don't have an account?",
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    decoration: TextDecoration.underline,
-                    decorationColor: Theme.of(context).textTheme.bodyMedium?.color,
+              if (_errorMessage != null)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: Text(
+                    _errorMessage!,
+                    style: TextStyle(
+                      color: Colors.red.shade600,
+                      fontSize: 13,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
                 ),
-              ),
 
-              const SizedBox(height: 24),
+              _isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : PrimaryButton(
+                      text: 'Log in',
+                      onPressed: _onLogin,
+                    ),
+
+              const SizedBox(height: 20),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "Don't have an account? ",
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                  GestureDetector(
+                    onTap: () => Navigator.pushNamed(
+                      context,
+                      AppRoutes.register,
+                    ),
+                    child: Text(
+                      'Sign up',
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.primary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ],
           ),
         ),

@@ -1,9 +1,12 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import '../../models/ingredient.dart';
 import '../../services/ingredient_service.dart';
 import '../../utils/validators.dart';
 import '../../widgets/buttons/primary_button.dart';
 import '../../widgets/common/custom_app_bar.dart';
+import '../../widgets/common/smart_image.dart';
 import '../../widgets/inputs/custom_text_field.dart';
 
 class IngredientEditScreen extends StatefulWidget {
@@ -17,6 +20,8 @@ class _IngredientEditScreenState extends State<IngredientEditScreen> {
 
   final _service = IngredientService.instance;
   Ingredient? _ingredient;
+
+  File? _newImage;
 
   late TextEditingController _nameController;
   late TextEditingController _brandController;
@@ -85,6 +90,53 @@ class _IngredientEditScreenState extends State<IngredientEditScreen> {
     super.dispose();
   }
 
+  Future<void> _pickImage() async {
+    final picker = ImagePicker();
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: Icon(Icons.camera_alt_rounded,
+                  color: Theme.of(context).colorScheme.primary),
+              title: const Text('Take a photo'),
+              onTap: () async {
+                Navigator.pop(context);
+                final picked = await picker.pickImage(
+                  source: ImageSource.camera,
+                  maxWidth: 800,
+                );
+                if (picked != null && mounted) {
+                  setState(() => _newImage = File(picked.path));
+                }
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.photo_library_rounded,
+                  color: Theme.of(context).colorScheme.primary),
+              title: const Text('Choose from gallery'),
+              onTap: () async {
+                Navigator.pop(context);
+                final picked = await picker.pickImage(
+                  source: ImageSource.gallery,
+                  maxWidth: 800,
+                );
+                if (picked != null && mounted) {
+                  setState(() => _newImage = File(picked.path));
+                }
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   bool _validateAll() {
     final newErrors = <String, String?>{};
     newErrors['name'] = Validators.validateName(_nameController.text);
@@ -109,6 +161,7 @@ class _IngredientEditScreenState extends State<IngredientEditScreen> {
 
     await _service.update(
       id: _ingredient!.id,
+      imagePath: _newImage?.path ?? _ingredient!.imagePath,
       name: _nameController.text.trim(),
       brand: _brandController.text.trim().isEmpty
           ? null
@@ -147,7 +200,11 @@ class _IngredientEditScreenState extends State<IngredientEditScreen> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
 
-            _EditableImage(),
+            _EditableImage(
+              originalPath: _ingredient!.imagePath,
+              newImage: _newImage,
+              onTap: _pickImage,
+            ),
             const SizedBox(height: 20),
 
             _FieldWithError(
@@ -267,26 +324,44 @@ class _IngredientEditScreenState extends State<IngredientEditScreen> {
   }
 }
 
-
 class _EditableImage extends StatelessWidget {
+  final String? originalPath;
+  final File? newImage;
+  final VoidCallback onTap;
+
+  const _EditableImage({
+    required this.onTap,
+    this.originalPath,
+    this.newImage,
+  });
+
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        ClipRRect(
-          borderRadius: BorderRadius.circular(16),
-          child: Image.asset(
-            'assets/images/placeholder_ingredient.png',
-            height: 180,
-            width: double.infinity,
-            fit: BoxFit.cover,
-          ),
-        ),
+        newImage != null
+            ? ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: Image.file(
+                  newImage!,
+                  height: 180,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                ),
+              )
+            : SmartImage(
+                imagePath: originalPath,
+                placeholder: 'assets/images/placeholder_ingredient.png',
+                height: 180,
+                width: double.infinity,
+                borderRadius: BorderRadius.circular(16),
+              ),
+
         Positioned(
           bottom: 12,
           right: 12,
           child: GestureDetector(
-            onTap: () {},
+            onTap: onTap,
             child: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
@@ -306,6 +381,7 @@ class _EditableImage extends StatelessWidget {
   }
 }
 
+
 class _FieldWithError extends StatelessWidget {
   final String? error;
   final Widget child;
@@ -319,15 +395,14 @@ class _FieldWithError extends StatelessWidget {
         child,
         if (error != null) ...[
           const SizedBox(height: 6),
-          Text(
-            error!,
-            style: TextStyle(color: Colors.red.shade600, fontSize: 12),
-          ),
+          Text(error!,
+              style: TextStyle(color: Colors.red.shade600, fontSize: 12)),
         ],
       ],
     );
   }
 }
+
 
 class _EditMicronutrientsSection extends StatelessWidget {
   final bool expanded;

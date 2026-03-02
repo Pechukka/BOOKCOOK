@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-
+import '../screens/splash_screen.dart';
+import '../screens/credits_screen.dart';
 import '../screens/auth/login_screen.dart';
 import '../screens/auth/register_screen.dart';
 import '../screens/home/home_screen.dart';
@@ -14,9 +15,7 @@ import '../screens/ingredients/ingredient_edit_screen.dart';
 
 class AppRoutes {
 
-  // ─────────────────────────────────────────────────────────
-  // NOMBRES DE RUTA
-  // ─────────────────────────────────────────────────────────
+  static const String splash            = '/';
   static const String login             = '/login';
   static const String register          = '/register';
   static const String home              = '/home';
@@ -28,11 +27,10 @@ class AppRoutes {
   static const String ingredientConfirm = '/ingredients/confirm';
   static const String ingredientDetail  = '/ingredients/detail';
   static const String ingredientEdit    = '/ingredients/edit';
+  static const String credits           = '/credits';
 
-  // ─────────────────────────────────────────────────────────
-  // MAPA DE RUTAS
-  // ─────────────────────────────────────────────────────────
   static Map<String, WidgetBuilder> get routes => {
+    splash:            (_) => const SplashScreen(),
     login:             (_) => const LoginScreen(),
     register:          (_) => const RegisterScreen(),
     home:              (_) => const HomeScreen(),
@@ -44,5 +42,6 @@ class AppRoutes {
     ingredientConfirm: (_) => const IngredientConfirmScreen(),
     ingredientDetail:  (_) => const IngredientDetailScreen(),
     ingredientEdit:    (_) => const IngredientEditScreen(),
+    credits:           (_) => const CreditsScreen(),
   };
 }

@@ -1,5 +1,5 @@
 import '../models/recipe.dart';
-import 'storage_service.dart';
+import 'firestore_service.dart';
 
 class RecipeService {
 
@@ -7,19 +7,18 @@ class RecipeService {
   RecipeService._internal();
   static RecipeService get instance => _instance;
 
-  final _storage = StorageService.instance;
-  static const String _storageKey = 'recipes';
+  final _firestore = FirestoreService.instance;
+  static const String _collection = 'recipes';
 
   List<Recipe> _recipes = [];
 
   Future<void> init() async {
-    final maps = await _storage.loadList(_storageKey);
+    final maps = await _firestore.getAll(_collection);
     _recipes = maps.map((m) => Recipe.fromMap(m)).toList();
   }
 
-  Future<void> _persist() async {
-    final maps = _recipes.map((r) => r.toMap()).toList();
-    await _storage.saveList(_storageKey, maps);
+  Future<void> _persist(Recipe recipe) async {
+    await _firestore.save(_collection, recipe.id, recipe.toMap());
   }
 
   List<Recipe> getAll() => List.from(_recipes);
@@ -54,7 +53,7 @@ class RecipeService {
       steps: steps,
     );
     _recipes.add(recipe);
-    await _persist();
+    await _persist(recipe);
     return recipe;
   }
 
@@ -73,7 +72,7 @@ class RecipeService {
       ingredients: ingredients,
       steps: steps,
     );
-    await _persist();
+    await _persist(_recipes[index]);
     return true;
   }
 
@@ -81,7 +80,7 @@ class RecipeService {
     final before = _recipes.length;
     _recipes.removeWhere((r) => r.id == id);
     if (_recipes.length < before) {
-      await _persist();
+      await _firestore.delete(_collection, id);
       return true;
     }
     return false;

@@ -1,29 +1,78 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
 import '../../app/routes.dart';
+import '../../services/open_food_service.dart';
 import '../../widgets/common/custom_app_bar.dart';
 
-class IngredientScannerScreen extends StatelessWidget {
+class IngredientScannerScreen extends StatefulWidget {
   const IngredientScannerScreen({super.key});
+
+  @override
+  State<IngredientScannerScreen> createState() =>
+      _IngredientScannerScreenState();
+}
+
+class _IngredientScannerScreenState extends State<IngredientScannerScreen> {
+
+  final MobileScannerController _cameraController = MobileScannerController();
+
+  bool _isProcessing = false;
+  bool _isLoading = false;    
+
+  @override
+  void dispose() {
+    _cameraController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _onBarcodeDetected(BarcodeCapture capture) async {
+    if (_isProcessing) return;
+
+    final barcode = capture.barcodes.firstOrNull;
+    if (barcode?.rawValue == null) return;
+
+    final code = barcode!.rawValue!;
+
+    _cameraController.stop();
+
+    setState(() {
+      _isProcessing = true;
+      _isLoading = true;
+    });
+
+    final result = await OpenFoodService.instance.getByBarcode(code);
+
+    if (!mounted) return;
+
+    setState(() => _isLoading = false);
+
+    await Navigator.pushNamed(
+      context,
+      AppRoutes.ingredientConfirm,
+      arguments: result,
+    );
+
+    if (mounted) {
+      setState(() => _isProcessing = false);
+      _cameraController.start();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const CustomAppBar(title: 'BookCook'),
-
       body: Stack(
         children: [
 
-          // ── FONDO SIMULANDO CAMARA POR AHORA ───
-          Container(
-            width: double.infinity,
-            height: double.infinity,
-            color: Colors.black87,
+          // ── CÁMARA REAL ──
+          MobileScanner(
+            controller: _cameraController,
+            onDetect: _onBarcodeDetected,
           ),
 
           // ── MARCO DE ESCANEO ──
-          Center(
-            child: _ScannerFrame(),
-          ),
+          Center(child: _ScannerFrame()),
 
           // ── TEXTO DE INSTRUCCIÓN ──
           Positioned(
@@ -39,21 +88,24 @@ class IngredientScannerScreen extends StatelessWidget {
             ),
           ),
 
-          // ── BOTÓN INFERIOR ──
-          Positioned(
-            bottom: 60,
-            left: 40,
-            right: 40,
-            child: _ScanButton(
-              onPressed: () {
-                // FASE 1: navegamos directamente a la confirmación
-                // simulando que se ha escaneado un producto.
-                // FASE 5: aquí el escáner real devolverá el código
-                // de barras y haremos la llamada a la API.
-                Navigator.pushNamed(context, AppRoutes.ingredientConfirm);
-              },
+          // ── SPINNER DE CARGA ─
+          if (_isLoading)
+            Container(
+              color: Colors.black54,
+              child: const Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CircularProgressIndicator(color: Colors.white),
+                    SizedBox(height: 16),
+                    Text(
+                      'Searching product...',
+                      style: TextStyle(color: Colors.white, fontSize: 16),
+                    ),
+                  ],
+                ),
+              ),
             ),
-          ),
         ],
       ),
     );
@@ -61,7 +113,6 @@ class IngredientScannerScreen extends StatelessWidget {
 }
 
 
-// ── MARCO DEL ESCÁNER ──
 class _ScannerFrame extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -69,39 +120,11 @@ class _ScannerFrame extends StatelessWidget {
       width: 260,
       height: 260,
       decoration: BoxDecoration(
-        // Sin color de fondo — queremos ver a través del marco
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: Theme.of(context).colorScheme.primary,
           width: 3,
         ),
-      ),
-    );
-  }
-}
-
-
-// ── BOTÓN DE ESCANEO ──
-class _ScanButton extends StatelessWidget {
-  final VoidCallback onPressed;
-
-  const _ScanButton({required this.onPressed});
-
-  @override
-  Widget build(BuildContext context) {
-    return ElevatedButton(
-      onPressed: onPressed,
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        foregroundColor: Colors.white,
-        padding: const EdgeInsets.symmetric(vertical: 16),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(14),
-        ),
-      ),
-      child: const Text(
-        'Scanning automatically',
-        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
       ),
     );
   }

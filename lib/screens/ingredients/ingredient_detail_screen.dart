@@ -3,13 +3,13 @@ import '../../app/routes.dart';
 import '../../models/ingredient.dart';
 import '../../services/ingredient_service.dart';
 import '../../widgets/common/custom_app_bar.dart';
+import '../../widgets/common/smart_image.dart';
 
 class IngredientDetailScreen extends StatelessWidget {
   const IngredientDetailScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-
     final ingredient =
         ModalRoute.of(context)!.settings.arguments as Ingredient;
 
@@ -79,7 +79,9 @@ class IngredientDetailScreen extends StatelessWidget {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
         title: const Text('Delete ingredient'),
         content: Text(
           'Are you sure you want to delete "${ingredient.name}"? '
@@ -96,15 +98,20 @@ class IngredientDetailScreen extends StatelessWidget {
             ),
           ),
           ElevatedButton(
-            onPressed: () {
-              IngredientService.instance.delete(ingredient.id);
-              Navigator.pop(context); 
-              Navigator.pop(context);
+            onPressed: () async {
+              await IngredientService.instance.delete(ingredient.id);
+              if (context.mounted) {
+                Navigator.pop(context);
+                Navigator.pop(context);
+              }
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.red.shade400,
               minimumSize: Size.zero,
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 20,
+                vertical: 10,
+              ),
             ),
             child: const Text('Delete'),
           ),
@@ -115,26 +122,22 @@ class IngredientDetailScreen extends StatelessWidget {
 }
 
 
-// ── IMAGEN ──
 class _IngredientDetailImage extends StatelessWidget {
   final String? imagePath;
   const _IngredientDetailImage({this.imagePath});
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
+    return SmartImage(
+      imagePath: imagePath,
+      placeholder: 'assets/images/placeholder_ingredient.png',
       height: 220,
       width: double.infinity,
-      child: Image.asset(
-        imagePath ?? 'assets/images/placeholder_ingredient.png',
-        fit: BoxFit.cover,
-      ),
     );
   }
 }
 
 
-// ── NOMBRE Y MARCA ──
 class _IngredientDetailHeader extends StatelessWidget {
   final String name;
   final String? brand;
@@ -161,7 +164,6 @@ class _IngredientDetailHeader extends StatelessWidget {
 }
 
 
-// ── FILA DE MACROS ──
 class _MacroCardsRow extends StatelessWidget {
   final Ingredient ingredient;
   const _MacroCardsRow({required this.ingredient});
@@ -199,7 +201,6 @@ class _MacroCardsRow extends StatelessWidget {
 }
 
 
-// ── TARJETA INDIVIDUAL ──
 class _MacroCard extends StatelessWidget {
   final String label;
   final String value;
@@ -238,7 +239,9 @@ class _MacroCard extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             label,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: 10),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              fontSize: 10,
+            ),
             textAlign: TextAlign.center,
           ),
         ],
@@ -248,7 +251,6 @@ class _MacroCard extends StatelessWidget {
 }
 
 
-// ── MICRONUTRIENTES ──
 class _MicronutrientsDetail extends StatefulWidget {
   final Ingredient ingredient;
   const _MicronutrientsDetail({required this.ingredient});
@@ -332,7 +334,6 @@ class _MicronutrientsDetailState extends State<_MicronutrientsDetail> {
 }
 
 
-// ── FILA DE MICRONUTRIENTE ──
 class _MicroRow extends StatelessWidget {
   final String label;
   final String value;
@@ -351,7 +352,8 @@ class _MicroRow extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(label, style: Theme.of(context).textTheme.labelMedium),
-          Text('$value $unit', style: Theme.of(context).textTheme.bodyMedium),
+          Text('$value $unit',
+              style: Theme.of(context).textTheme.bodyMedium),
         ],
       ),
     );
@@ -359,7 +361,6 @@ class _MicroRow extends StatelessWidget {
 }
 
 
-// ── BOTONES ──
 class _ActionButtons extends StatelessWidget {
   final VoidCallback onEdit;
   final VoidCallback onDelete;

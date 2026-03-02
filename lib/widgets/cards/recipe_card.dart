@@ -1,89 +1,65 @@
-// lib/widgets/cards/recipe_card.dart
-
 import 'package:flutter/material.dart';
-
+import '../common/smart_image.dart';
 
 class RecipeCard extends StatelessWidget {
   final String name;
-  final String? imagePath; // nullable: puede no tener imagen
-  final VoidCallback onTap;
+  final String? imagePath;
+  final VoidCallback? onTap;
 
   const RecipeCard({
     super.key,
     required this.name,
-    required this.onTap,
-    this.imagePath, // opcional sin required
+    this.imagePath,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-
-    // InkWell hace que cualquier widget reaccione al tap con el efecto de onda 
-    return InkWell(
+    return GestureDetector(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
       child: Container(
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Theme.of(context).colorScheme.primary.withOpacity(0.08),
+              color: Colors.black.withOpacity(0.05),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
           ],
         ),
-
-        // ClipRRect recorta sus hijos con bordes redondeados.
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-
-              // IMAGEN 
-              Expanded(
-                flex: 2,
-                child: _buildImage(),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Expanded(
+              flex: 3,
+              child: SmartImage(
+                imagePath: imagePath,
+                placeholder: 'assets/images/placeholder_recipe.png',
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(16),
+                ),
               ),
-
-              // NOMBRE
-              Expanded(
-                flex: 1,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 8,
-                  ),
+            ),
+            Expanded(
+              flex: 2,
+              child: Padding(
+                padding: const EdgeInsets.all(10),
+                child: Center(
                   child: Text(
                     name,
                     style: Theme.of(context).textTheme.labelMedium,
-                    // Si el nombre es muy largo, corta con "..."
-                    overflow: TextOverflow.ellipsis,
                     maxLines: 2,
+                    textAlign: TextAlign.center,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
-    );
-  }
-
-  // METODO PARA DECIDIR CARGAR IMAGEN
-  Widget _buildImage() {
-    if (imagePath != null) {
-      return Image.asset(
-        imagePath!,
-        fit: BoxFit.cover,
-      );
-    }
-
-    return Image.asset(
-      'assets/images/placeholder_recipe.png',
-      fit: BoxFit.cover,
     );
   }
 }

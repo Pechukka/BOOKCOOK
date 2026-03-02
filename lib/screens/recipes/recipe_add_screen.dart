@@ -1,4 +1,6 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import '../../models/ingredient.dart';
 import '../../models/recipe.dart';
 import '../../services/ingredient_service.dart';
@@ -26,8 +28,9 @@ class _RecipeAddScreenState extends State<RecipeAddScreen> {
   ];
 
   final List<RecipeIngredient> _selectedIngredients = [];
-
   final Map<String, String?> _errors = {};
+
+  File? _selectedImage;
 
   @override
   void dispose() {
@@ -36,6 +39,53 @@ class _RecipeAddScreenState extends State<RecipeAddScreen> {
       c.dispose();
     }
     super.dispose();
+  }
+
+  Future<void> _pickImage() async {
+    final picker = ImagePicker();
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: Icon(Icons.camera_alt_rounded,
+                  color: Theme.of(context).colorScheme.primary),
+              title: const Text('Take a photo'),
+              onTap: () async {
+                Navigator.pop(context);
+                final picked = await picker.pickImage(
+                  source: ImageSource.camera,
+                  maxWidth: 800,
+                );
+                if (picked != null && mounted) {
+                  setState(() => _selectedImage = File(picked.path));
+                }
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.photo_library_rounded,
+                  color: Theme.of(context).colorScheme.primary),
+              title: const Text('Choose from gallery'),
+              onTap: () async {
+                Navigator.pop(context);
+                final picked = await picker.pickImage(
+                  source: ImageSource.gallery,
+                  maxWidth: 800,
+                );
+                if (picked != null && mounted) {
+                  setState(() => _selectedImage = File(picked.path));
+                }
+              },
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   void _addStep() {
@@ -64,7 +114,6 @@ class _RecipeAddScreenState extends State<RecipeAddScreen> {
 
   void _showIngredientSelector() {
     final availableIngredients = _ingredientService.getAll();
-
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -85,10 +134,7 @@ class _RecipeAddScreenState extends State<RecipeAddScreen> {
                 Navigator.pop(modalContext);
                 setState(() {
                   _selectedIngredients.add(
-                    RecipeIngredient(
-                      ingredient: ingredient,
-                      quantity: '',
-                    ),
+                    RecipeIngredient(ingredient: ingredient, quantity: ''),
                   );
                 });
               },
@@ -102,15 +148,10 @@ class _RecipeAddScreenState extends State<RecipeAddScreen> {
   bool _validateAll() {
     final newErrors = <String, String?>{};
     newErrors['name'] = Validators.validateName(_nameController.text);
-
-    if (_selectedIngredients.isEmpty) {
-      newErrors['ingredients'] = 'Add at least one ingredient';
-    } else {
-      newErrors['ingredients'] = null;
-    }
-
-    newErrors['steps'] = Validators.validateStep(_stepControllers.first.text);
-
+    newErrors['ingredients'] =
+        _selectedIngredients.isEmpty ? 'Add at least one ingredient' : null;
+    newErrors['steps'] =
+        Validators.validateStep(_stepControllers.first.text);
     setState(() => _errors.addAll(newErrors));
     return newErrors.values.every((e) => e == null);
   }
@@ -127,6 +168,7 @@ class _RecipeAddScreenState extends State<RecipeAddScreen> {
       name: _nameController.text.trim(),
       ingredients: _selectedIngredients,
       steps: steps,
+      imagePath: _selectedImage?.path, 
     );
 
     if (mounted) Navigator.pop(context);
@@ -160,10 +202,8 @@ class _RecipeAddScreenState extends State<RecipeAddScreen> {
 
             if (_errors['ingredients'] != null) ...[
               const SizedBox(height: 6),
-              Text(
-                _errors['ingredients']!,
-                style: TextStyle(color: Colors.red.shade600, fontSize: 12),
-              ),
+              Text(_errors['ingredients']!,
+                  style: TextStyle(color: Colors.red.shade600, fontSize: 12)),
             ],
 
             const SizedBox(height: 12),
@@ -174,10 +214,8 @@ class _RecipeAddScreenState extends State<RecipeAddScreen> {
 
             if (_errors['steps'] != null) ...[
               const SizedBox(height: 6),
-              Text(
-                _errors['steps']!,
-                style: TextStyle(color: Colors.red.shade600, fontSize: 12),
-              ),
+              Text(_errors['steps']!,
+                  style: TextStyle(color: Colors.red.shade600, fontSize: 12)),
             ],
 
             const SizedBox(height: 12),
@@ -197,7 +235,7 @@ class _RecipeAddScreenState extends State<RecipeAddScreen> {
 
   Widget _buildPhotoArea(BuildContext context) {
     return GestureDetector(
-      onTap: () {}, 
+      onTap: _pickImage,
       child: Container(
         height: 180,
         decoration: BoxDecoration(
@@ -207,16 +245,29 @@ class _RecipeAddScreenState extends State<RecipeAddScreen> {
             color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
           ),
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.upload_rounded, size: 36,
-                color: Theme.of(context).colorScheme.primary.withOpacity(0.5)),
-            const SizedBox(height: 8),
-            Text('Add recipe photo',
-                style: Theme.of(context).textTheme.bodyMedium),
-          ],
-        ),
+        child: _selectedImage != null
+            ? ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: Image.file(
+                  _selectedImage!,
+                  fit: BoxFit.cover,
+                  width: double.infinity,
+                ),
+              )
+            : Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.upload_rounded,
+                      size: 36,
+                      color: Theme.of(context)
+                          .colorScheme
+                          .primary
+                          .withOpacity(0.5)),
+                  const SizedBox(height: 8),
+                  Text('Add recipe photo',
+                      style: Theme.of(context).textTheme.bodyMedium),
+                ],
+              ),
       ),
     );
   }
@@ -229,12 +280,10 @@ class _RecipeAddScreenState extends State<RecipeAddScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          title,
-          style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-            fontSize: 16,
-          ),
-        ),
+        Text(title,
+            style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+              fontSize: 16,
+            )),
         TextButton.icon(
           onPressed: onAdd,
           icon: Icon(Icons.add_circle_outline_rounded,
@@ -284,7 +333,6 @@ class _RecipeAddScreenState extends State<RecipeAddScreen> {
               Text('${index + 1}.',
                   style: Theme.of(context).textTheme.labelMedium),
               const SizedBox(width: 12),
-
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -292,32 +340,26 @@ class _RecipeAddScreenState extends State<RecipeAddScreen> {
                     Text(recipeIngredient.ingredient.name,
                         style: Theme.of(context).textTheme.labelMedium),
                     if (recipeIngredient.ingredient.brand != null)
-                      Text(
-                        recipeIngredient.ingredient.brand!,
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          fontSize: 11,
-                        ),
-                      ),
+                      Text(recipeIngredient.ingredient.brand!,
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyMedium
+                              ?.copyWith(fontSize: 11)),
                   ],
                 ),
               ),
-
-              // Campo de cantidad
               SizedBox(
                 width: 80,
                 child: TextField(
                   decoration: const InputDecoration(
                     hintText: 'Qty',
-                    contentPadding: EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 8,
-                    ),
+                    contentPadding:
+                        EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                   ),
                   onChanged: (value) => _updateQuantity(index, value),
                 ),
               ),
               const SizedBox(width: 8),
-
               GestureDetector(
                 onTap: () => _removeIngredient(index),
                 child: Icon(Icons.close_rounded,
@@ -366,9 +408,8 @@ class _RecipeAddScreenState extends State<RecipeAddScreen> {
                 controller: controller,
                 maxLines: 3,
                 minLines: 1,
-                decoration: InputDecoration(
-                  hintText: 'Describe step ${index + 1}...',
-                ),
+                decoration:
+                    InputDecoration(hintText: 'Describe step ${index + 1}...'),
               ),
             ),
             if (_stepControllers.length > 1)
@@ -438,15 +479,11 @@ class _RecipeAddScreenState extends State<RecipeAddScreen> {
                 label: 'Protein',
               ),
               _NutritionChip(
-                value: hasIngredients
-                    ? totalCarbs.toStringAsFixed(1)
-                    : '—',
+                value: hasIngredients ? totalCarbs.toStringAsFixed(1) : '—',
                 label: 'Carbs',
               ),
               _NutritionChip(
-                value: hasIngredients
-                    ? totalFats.toStringAsFixed(1)
-                    : '—',
+                value: hasIngredients ? totalFats.toStringAsFixed(1) : '—',
                 label: 'Fats',
               ),
             ],
@@ -458,7 +495,6 @@ class _RecipeAddScreenState extends State<RecipeAddScreen> {
 }
 
 
-// ── CHIP NUTRICIONAL ──
 class _NutritionChip extends StatelessWidget {
   final String value;
   final String label;
@@ -474,13 +510,11 @@ class _NutritionChip extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Text(
-            value,
-            style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-              fontSize: 18,
-              color: Theme.of(context).colorScheme.primary,
-            ),
-          ),
+          Text(value,
+              style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                fontSize: 18,
+                color: Theme.of(context).colorScheme.primary,
+              )),
           const SizedBox(height: 2),
           Text(label,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -493,7 +527,6 @@ class _NutritionChip extends StatelessWidget {
 }
 
 
-// ── MODAL DE SELECCIÓN ──
 class _IngredientSelectorModal extends StatefulWidget {
   final ScrollController scrollController;
   final List<Ingredient> ingredients;
@@ -510,10 +543,8 @@ class _IngredientSelectorModal extends StatefulWidget {
       _IngredientSelectorModalState();
 }
 
-class _IngredientSelectorModalState
-    extends State<_IngredientSelectorModal> {
+class _IngredientSelectorModalState extends State<_IngredientSelectorModal> {
 
-  // Lista filtrada que se muestra en el modal
   late List<Ingredient> _filtered;
 
   @override
@@ -564,7 +595,6 @@ class _IngredientSelectorModalState
               ],
             ),
           ),
-
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
             child: TextField(
@@ -575,7 +605,6 @@ class _IngredientSelectorModalState
               ),
             ),
           ),
-
           Expanded(
             child: _filtered.isEmpty
                 ? Center(
@@ -623,8 +652,7 @@ class _IngredientSelectorModalState
                     itemBuilder: (context, index) {
                       final ingredient = _filtered[index];
                       return GestureDetector(
-                        onTap: () =>
-                            widget.onIngredientSelected(ingredient),
+                        onTap: () => widget.onIngredientSelected(ingredient),
                         child: Container(
                           decoration: BoxDecoration(
                             color: Theme.of(context).colorScheme.surface,
@@ -686,6 +714,7 @@ class _IngredientSelectorModalState
     );
   }
 }
+
 
 class _FieldWithError extends StatelessWidget {
   final String? error;

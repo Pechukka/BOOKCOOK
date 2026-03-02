@@ -8,20 +8,12 @@ class BookCookApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-
-      // ── TITULO ──
       title: 'BookCook',
-
-      // ── QUITAMOS ETIQUETA DEBUG ──
       debugShowCheckedModeBanner: false,
-
-      // ── TEMA ──
       theme: AppTheme.lightTheme,
 
-      // ── RUTA INICIAL ──
-      initialRoute: AppRoutes.login,
+      initialRoute: AppRoutes.splash,
 
-      // ── RUTAS ──
       routes: AppRoutes.routes,
     );
   }

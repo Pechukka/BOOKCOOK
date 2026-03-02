@@ -1,6 +1,5 @@
-import 'dart:async';
 import '../models/ingredient.dart';
-import 'storage_service.dart';
+import 'firestore_service.dart';
 
 class IngredientService {
 
@@ -8,22 +7,21 @@ class IngredientService {
   IngredientService._internal();
   static IngredientService get instance => _instance;
 
-  final _storage = StorageService.instance;
+  final _firestore = FirestoreService.instance;
 
-  static const String _storageKey = 'ingredients';
+  static const String _collection = 'ingredients';
 
   List<Ingredient> _ingredients = [];
 
-  // ── INICIALIZACIÓN ──
+  // ── INIT ──
   Future<void> init() async {
-    final maps = await _storage.loadList(_storageKey);
+    final maps = await _firestore.getAll(_collection);
     _ingredients = maps.map((m) => Ingredient.fromMap(m)).toList();
   }
 
-  // ── GUARDAR EN DISCO ─
-  Future<void> _persist() async {
-    final maps = _ingredients.map((i) => i.toMap()).toList();
-    await _storage.saveList(_storageKey, maps);
+  // ── PERSISTIR ──
+  Future<void> _persist(Ingredient ingredient) async {
+    await _firestore.save(_collection, ingredient.id, ingredient.toMap());
   }
 
   // ── LEER ──
@@ -75,7 +73,7 @@ class IngredientService {
     );
 
     _ingredients.add(ingredient);
-    await _persist();
+    await _persist(ingredient);
     return ingredient;
   }
 
@@ -109,7 +107,7 @@ class IngredientService {
       sodium: sodium,
     );
 
-    await _persist();
+    await _persist(_ingredients[index]);
     return true;
   }
 
@@ -118,7 +116,7 @@ class IngredientService {
     final before = _ingredients.length;
     _ingredients.removeWhere((i) => i.id == id);
     if (_ingredients.length < before) {
-      await _persist();
+      await _firestore.delete(_collection, id);
       return true;
     }
     return false;

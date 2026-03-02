@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../app/routes.dart';
+import '../../services/auth_service.dart';
+import '../../utils/validators.dart';
 import '../../widgets/buttons/primary_button.dart';
 import '../../widgets/common/logo_header.dart';
 import '../../widgets/inputs/custom_text_field.dart';
@@ -13,28 +15,63 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> {
 
-  // ── CONTROLLERS ──
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
+  final _nameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _confirmController = TextEditingController();
+  final _auth = AuthService.instance;
+
+  bool _isLoading = false;
+  String? _errorMessage;
+  final Map<String, String?> _errors = {};
 
   @override
   void dispose() {
     _nameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
-    _confirmPasswordController.dispose();
+    _confirmController.dispose();
     super.dispose();
   }
 
-  // ── METODOS DE NAVEGACION ──
-  void _onRegisterPressed() {
-    Navigator.pushReplacementNamed(context, AppRoutes.home);
+  bool _validateAll() {
+    final newErrors = <String, String?>{};
+    newErrors['name'] = Validators.validateName(_nameController.text);
+    newErrors['email'] = Validators.validateEmail(_emailController.text);
+    newErrors['password'] = Validators.validatePassword(_passwordController.text);
+    newErrors['confirm'] = Validators.validateConfirmPassword(
+      _confirmController.text,
+      _passwordController.text,
+    );
+    setState(() => _errors.addAll(newErrors));
+    return newErrors.values.every((e) => e == null);
   }
 
-  void _onGoToLogin() {
-    Navigator.pop(context);
+  Future<void> _onRegister() async {
+    if (!_validateAll()) return;
+
+    FocusScope.of(context).unfocus();
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    final error = await _auth.register(
+      name: _nameController.text,
+      email: _emailController.text,
+      password: _passwordController.text,
+    );
+
+    if (!mounted) return;
+
+    if (error != null) {
+      setState(() {
+        _errorMessage = error;
+        _isLoading = false;
+      });
+    } else {
+      Navigator.pushReplacementNamed(context, AppRoutes.home);
+    }
   }
 
   @override
@@ -42,49 +79,33 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 28,
-            vertical: 24,
-          ),
+          padding: const EdgeInsets.all(24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
 
               const SizedBox(height: 24),
-
-              const LogoHeader(
-                subtitle: 'Create your account',
-              ),
-
-              const SizedBox(height: 8),
-
-              Text(
-                'Start organizing your recipes',
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-
-              const SizedBox(height: 36),
+              const LogoHeader(subtitle: 'Create your account'),
+              const SizedBox(height: 32),
 
               CustomTextField(
-                label: 'Name',
+                label: 'Full name',
                 hint: 'Your name',
                 prefixIcon: Icons.person_outline_rounded,
                 controller: _nameController,
-                keyboardType: TextInputType.name,
               ),
-
-              const SizedBox(height: 20),
+              if (_errors['name'] != null) _ErrorText(_errors['name']!),
+              const SizedBox(height: 16),
 
               CustomTextField(
                 label: 'Email',
                 hint: 'your@email.com',
-                prefixIcon: Icons.mail_outline_rounded,
+                prefixIcon: Icons.email_outlined,
                 controller: _emailController,
                 keyboardType: TextInputType.emailAddress,
               ),
-
-              const SizedBox(height: 20),
+              if (_errors['email'] != null) _ErrorText(_errors['email']!),
+              const SizedBox(height: 16),
 
               CustomTextField(
                 label: 'Password',
@@ -93,43 +114,80 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 controller: _passwordController,
                 isPassword: true,
               ),
-
-              const SizedBox(height: 20),
+              if (_errors['password'] != null) _ErrorText(_errors['password']!),
+              const SizedBox(height: 16),
 
               CustomTextField(
                 label: 'Confirm password',
                 hint: '••••••••',
                 prefixIcon: Icons.lock_outline_rounded,
-                controller: _confirmPasswordController,
+                controller: _confirmController,
                 isPassword: true,
               ),
+              if (_errors['confirm'] != null) _ErrorText(_errors['confirm']!),
+              const SizedBox(height: 12),
 
-              const SizedBox(height: 32),
-
-              PrimaryButton(
-                text: 'Create account',
-                onPressed: _onRegisterPressed,
-              ),
-
-              const SizedBox(height: 24),
-
-              GestureDetector(
-                onTap: _onGoToLogin,
-                child: Text(
-                  'Already have an account?',
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    decoration: TextDecoration.underline,
-                    decorationColor:
-                        Theme.of(context).textTheme.bodyMedium?.color,
+              if (_errorMessage != null)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: Text(
+                    _errorMessage!,
+                    style: TextStyle(
+                      color: Colors.red.shade600,
+                      fontSize: 13,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
                 ),
-              ),
 
-              const SizedBox(height: 24),
+              _isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : PrimaryButton(
+                      text: 'Create account',
+                      onPressed: _onRegister,
+                    ),
+
+              const SizedBox(height: 20),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Already have an account? ',
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                  GestureDetector(
+                    onTap: () => Navigator.pop(context),
+                    child: Text(
+                      'Log in',
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.primary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _ErrorText extends StatelessWidget {
+  final String text;
+  const _ErrorText(this.text);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 6),
+      child: Text(
+        text,
+        style: TextStyle(color: Colors.red.shade600, fontSize: 12),
       ),
     );
   }
