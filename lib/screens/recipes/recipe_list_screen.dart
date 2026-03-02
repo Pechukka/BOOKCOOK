@@ -30,15 +30,11 @@ class _RecipeListScreenState extends State<RecipeListScreen> {
   }
 
   void _loadRecipes() {
-    setState(() {
-      _recipes = _service.getAll();
-    });
+    setState(() => _recipes = _service.getAll());
   }
 
   void _onSearch(String query) {
-    setState(() {
-      _recipes = _service.search(query);
-    });
+    setState(() => _recipes = _service.search(query));
   }
 
   Future<void> _onAddRecipe() async {
@@ -57,44 +53,23 @@ class _RecipeListScreenState extends State<RecipeListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        elevation: 0,
-        automaticallyImplyLeading: false,
-        centerTitle: true,
-        title: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Image.asset('assets/images/logo_white.png', height: 28),
-            const SizedBox(width: 8),
-            Text(
-              'BookCook',
-              style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                fontSize: 20,
-                color: Colors.white,
-              ),
-            ),
-          ],
-        ),
-      ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
-            child: TextField(
-              controller: _searchController,
-              onChanged: _onSearch,
-              decoration: const InputDecoration(
-                hintText: 'Search recipes...',
-                prefixIcon: Icon(Icons.search_rounded),
-                suffixIcon: Icon(Icons.tune_rounded),
-              ),
+    // Sin Scaffold — HomeScreen ya proporciona el Scaffold con AppBar y Drawer
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+          child: TextField(
+            controller: _searchController,
+            onChanged: _onSearch,
+            decoration: const InputDecoration(
+              hintText: 'Search recipes...',
+              prefixIcon: Icon(Icons.search_rounded),
+              suffixIcon: Icon(Icons.tune_rounded),
             ),
           ),
-          Expanded(child: _buildGrid()),
-        ],
-      ),
+        ),
+        Expanded(child: _buildGrid()),
+      ],
     );
   }
 
@@ -150,7 +125,8 @@ class _RecipeListScreenState extends State<RecipeListScreen> {
               ),
             ),
             const SizedBox(height: 12),
-            Text('Add Recipe', style: Theme.of(context).textTheme.labelMedium),
+            Text('Add Recipe',
+                style: Theme.of(context).textTheme.labelMedium),
           ],
         ),
       ),

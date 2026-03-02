@@ -15,7 +15,6 @@ class _IngredientListScreenState extends State<IngredientListScreen> {
 
   final _service = IngredientService.instance;
   final TextEditingController _searchController = TextEditingController();
-
   List<Ingredient> _ingredients = [];
 
   @override
@@ -31,15 +30,11 @@ class _IngredientListScreenState extends State<IngredientListScreen> {
   }
 
   void _loadIngredients() {
-    setState(() {
-      _ingredients = _service.getAll();
-    });
+    setState(() => _ingredients = _service.getAll());
   }
 
   void _onSearch(String query) {
-    setState(() {
-      _ingredients = _service.search(query);
-    });
+    setState(() => _ingredients = _service.search(query));
   }
 
   Future<void> _onAddIngredient() async {
@@ -48,7 +43,6 @@ class _IngredientListScreenState extends State<IngredientListScreen> {
   }
 
   Future<void> _onIngredientTapped(Ingredient ingredient) async {
-    // Pasamos el ingrediente como argumento de navegación
     await Navigator.pushNamed(
       context,
       AppRoutes.ingredientDetail,
@@ -59,53 +53,27 @@ class _IngredientListScreenState extends State<IngredientListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        elevation: 0,
-        automaticallyImplyLeading: false,
-        centerTitle: true,
-        title: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Image.asset('assets/images/logo_white.png', height: 28),
-            const SizedBox(width: 8),
-            Text(
-              'BookCook',
-              style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                fontSize: 20,
-                color: Colors.white,
-              ),
+    // Sin Scaffold — HomeScreen ya proporciona el Scaffold con AppBar y Drawer
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+          child: TextField(
+            controller: _searchController,
+            onChanged: _onSearch,
+            decoration: const InputDecoration(
+              hintText: 'Search ingredients...',
+              prefixIcon: Icon(Icons.search_rounded),
+              suffixIcon: Icon(Icons.tune_rounded),
             ),
-          ],
+          ),
         ),
-      ),
-      body: Column(
-        children: [
-
-          // BARRA DE BÚSQUEDA
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
-            child: TextField(
-              controller: _searchController,
-              onChanged: _onSearch,
-              decoration: const InputDecoration(
-                hintText: 'Search ingredients...',
-                prefixIcon: Icon(Icons.search_rounded),
-                suffixIcon: Icon(Icons.tune_rounded),
-              ),
-            ),
-          ),
-
-          Expanded(
-            child: _buildContent(),
-          ),
-        ],
-      ),
+        Expanded(child: _buildGrid()),
+      ],
     );
   }
 
-  Widget _buildContent() {
+  Widget _buildGrid() {
     return GridView.builder(
       padding: const EdgeInsets.all(16),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -116,9 +84,7 @@ class _IngredientListScreenState extends State<IngredientListScreen> {
       ),
       itemCount: _ingredients.length + 1,
       itemBuilder: (context, index) {
-        if (index == 0) {
-          return _buildAddCard();
-        }
+        if (index == 0) return _buildAddCard();
         final ingredient = _ingredients[index - 1];
         return IngredientCard(
           name: ingredient.name,
@@ -160,10 +126,8 @@ class _IngredientListScreenState extends State<IngredientListScreen> {
               ),
             ),
             const SizedBox(height: 12),
-            Text(
-              'Add Ingredient',
-              style: Theme.of(context).textTheme.labelMedium,
-            ),
+            Text('Add Ingredient',
+                style: Theme.of(context).textTheme.labelMedium),
           ],
         ),
       ),

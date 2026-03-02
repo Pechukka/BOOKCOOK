@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../models/recipe.dart';
 import '../../widgets/common/custom_app_bar.dart';
+import '../../widgets/common/smart_image.dart';
 
 class RecipeDetailScreen extends StatefulWidget {
   const RecipeDetailScreen({super.key});
@@ -56,13 +57,11 @@ class _RecipeImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
+    return SmartImage(
+      imagePath: imagePath,
+      placeholder: 'assets/images/placeholder_recipe.png',
       height: 220,
       width: double.infinity,
-      child: Image.asset(
-        imagePath ?? 'assets/images/placeholder_recipe.png',
-        fit: BoxFit.cover,
-      ),
     );
   }
 }
@@ -182,7 +181,8 @@ class _StepsTab extends StatelessWidget {
   Widget build(BuildContext context) {
     if (recipe.steps.isEmpty) {
       return Center(
-        child: Text('No steps', style: Theme.of(context).textTheme.bodyMedium),
+        child: Text('No steps',
+            style: Theme.of(context).textTheme.bodyMedium),
       );
     }
     return ListView.builder(
@@ -203,12 +203,14 @@ class _StepsTab extends StatelessWidget {
                   shape: BoxShape.circle,
                 ),
                 child: Center(
-                  child: Text('${index + 1}',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold,
-                      )),
+                  child: Text(
+                    '${index + 1}',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
               ),
               Expanded(
@@ -252,17 +254,20 @@ class _NutritionTab extends StatelessWidget {
               )),
           const SizedBox(height: 12),
           _NutritionRow(
-              label: 'Protein',
-              value: recipe.totalProtein.toStringAsFixed(1),
-              unit: 'g'),
+            label: 'Protein',
+            value: recipe.totalProtein.toStringAsFixed(1),
+            unit: 'g',
+          ),
           _NutritionRow(
-              label: 'Carbohydrates',
-              value: recipe.totalCarbs.toStringAsFixed(1),
-              unit: 'g'),
+            label: 'Carbohydrates',
+            value: recipe.totalCarbs.toStringAsFixed(1),
+            unit: 'g',
+          ),
           _NutritionRow(
-              label: 'Fats',
-              value: recipe.totalFats.toStringAsFixed(1),
-              unit: 'g'),
+            label: 'Fats',
+            value: recipe.totalFats.toStringAsFixed(1),
+            unit: 'g',
+          ),
         ],
       ),
     );
@@ -296,17 +301,21 @@ class _NutritionHighlight extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Text(value,
-                  style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                    fontSize: 48,
-                    color: Theme.of(context).colorScheme.primary,
-                  )),
+              Text(
+                value,
+                style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                  fontSize: 48,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+              ),
               Padding(
                 padding: const EdgeInsets.only(bottom: 8, left: 4),
-                child: Text(unit,
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.primary,
-                    )),
+                child: Text(
+                  unit,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                ),
               ),
             ],
           ),
@@ -335,7 +344,8 @@ class _NutritionRow extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(label, style: Theme.of(context).textTheme.labelMedium),
-          Text('$value $unit', style: Theme.of(context).textTheme.bodyMedium),
+          Text('$value $unit',
+              style: Theme.of(context).textTheme.bodyMedium),
         ],
       ),
     );

@@ -58,7 +58,7 @@ class CreditsScreen extends StatelessWidget {
             _CreditsSection(
               icon: Icons.person_outline_rounded,
               title: 'Author',
-              content: 'Your Name Here\nDAM — 2025/2026',
+              content: 'Elias Pedrosa Madrid\nDAM — 2025/2026',
             ),
 
             const SizedBox(height: 20),

@@ -1,5 +1,3 @@
-// lib/screens/home/home_screen.dart
-
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../app/routes.dart';
@@ -31,16 +29,12 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _initServices() async {
     await IngredientService.instance.init();
     await RecipeService.instance.init();
-    if (mounted) {
-      setState(() => _initialized = true);
-    }
+    if (mounted) setState(() => _initialized = true);
   }
 
   Future<void> _onLogout() async {
     Navigator.pop(context);
-
     await AuthService.instance.logout();
-
     if (mounted) {
       Navigator.pushNamedAndRemoveUntil(
         context,
@@ -49,6 +43,10 @@ class _HomeScreenState extends State<HomeScreen> {
       );
     }
   }
+
+  // Títulos del AppBar según la pestaña activa
+  String get _currentTitle =>
+      _currentIndex == 0 ? 'Recipes' : 'Ingredients';
 
   @override
   Widget build(BuildContext context) {
@@ -60,9 +58,38 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
 
-      // ── DRAWER ──
+      // ── APP BAR ────────────────────────────────────────
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        elevation: 0,
+        centerTitle: true,
+        // Botón de menú que abre el drawer
+        leading: Builder(
+          builder: (ctx) => IconButton(
+            icon: const Icon(Icons.menu_rounded, color: Colors.white),
+            onPressed: () => Scaffold.of(ctx).openDrawer(),
+          ),
+        ),
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Image.asset('assets/images/logo_white.png', height: 28),
+            const SizedBox(width: 8),
+            Text(
+              'BookCook',
+              style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                fontSize: 20,
+                color: Colors.white,
+              ),
+            ),
+          ],
+        ),
+      ),
+
+      // ── DRAWER ─────────────────────────────────────────
       drawer: _buildDrawer(context),
 
+      // ── BODY ───────────────────────────────────────────
       body: IndexedStack(
         index: _currentIndex,
         children: const [
@@ -71,6 +98,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
 
+      // ── BOTTOM NAV ─────────────────────────────────────
       bottomNavigationBar: BottomNavBar(
         currentIndex: _currentIndex,
         onTap: (index) => setState(() => _currentIndex = index),
@@ -84,8 +112,6 @@ class _HomeScreenState extends State<HomeScreen> {
     return Drawer(
       child: Column(
         children: [
-
-          // ── CABECERA DEL DRAWER ──
           DrawerHeader(
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.primary,
@@ -108,7 +134,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
                 const SizedBox(height: 4),
-                // Email del usuario logueado
                 Text(
                   user?.email ?? '',
                   style: const TextStyle(
@@ -120,9 +145,6 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
 
-          // ── OPCIONES DEL DRAWER ──
-
-          // CREDITS
           ListTile(
             leading: Icon(
               Icons.info_outline_rounded,
@@ -130,23 +152,17 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             title: const Text('Credits'),
             onTap: () {
-              Navigator.pop(context); 
+              Navigator.pop(context);
               Navigator.pushNamed(context, AppRoutes.credits);
             },
           ),
 
           const Divider(),
 
-          // LOGOUT
           ListTile(
-            leading: const Icon(
-              Icons.logout_rounded,
-              color: Colors.red,
-            ),
-            title: const Text(
-              'Log out',
-              style: TextStyle(color: Colors.red),
-            ),
+            leading: const Icon(Icons.logout_rounded, color: Colors.red),
+            title: const Text('Log out',
+                style: TextStyle(color: Colors.red)),
             onTap: _onLogout,
           ),
         ],

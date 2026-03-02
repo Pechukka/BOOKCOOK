@@ -8,6 +8,7 @@ import '../../services/recipe_service.dart';
 import '../../utils/validators.dart';
 import '../../widgets/buttons/primary_button.dart';
 import '../../widgets/common/custom_app_bar.dart';
+import '../../widgets/common/smart_image.dart';
 import '../../widgets/inputs/custom_text_field.dart';
 
 class RecipeAddScreen extends StatefulWidget {
@@ -29,7 +30,6 @@ class _RecipeAddScreenState extends State<RecipeAddScreen> {
 
   final List<RecipeIngredient> _selectedIngredients = [];
   final Map<String, String?> _errors = {};
-
   File? _selectedImage;
 
   @override
@@ -168,7 +168,7 @@ class _RecipeAddScreenState extends State<RecipeAddScreen> {
       name: _nameController.text.trim(),
       ingredients: _selectedIngredients,
       steps: steps,
-      imagePath: _selectedImage?.path, 
+      imagePath: _selectedImage?.path,
     );
 
     if (mounted) Navigator.pop(context);
@@ -281,9 +281,10 @@ class _RecipeAddScreenState extends State<RecipeAddScreen> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(title,
-            style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-              fontSize: 16,
-            )),
+            style: Theme.of(context)
+                .textTheme
+                .headlineLarge
+                ?.copyWith(fontSize: 16)),
         TextButton.icon(
           onPressed: onAdd,
           icon: Icon(Icons.add_circle_outline_rounded,
@@ -408,8 +409,8 @@ class _RecipeAddScreenState extends State<RecipeAddScreen> {
                 controller: controller,
                 maxLines: 3,
                 minLines: 1,
-                decoration:
-                    InputDecoration(hintText: 'Describe step ${index + 1}...'),
+                decoration: InputDecoration(
+                    hintText: 'Describe step ${index + 1}...'),
               ),
             ),
             if (_stepControllers.length > 1)
@@ -456,9 +457,10 @@ class _RecipeAddScreenState extends State<RecipeAddScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text('Nutrition Preview',
-              style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                fontSize: 15,
-              )),
+              style: Theme.of(context)
+                  .textTheme
+                  .headlineLarge
+                  ?.copyWith(fontSize: 15)),
           const SizedBox(height: 4),
           Text('Estimated values based on ingredients',
               style: Theme.of(context).textTheme.bodyMedium),
@@ -479,11 +481,15 @@ class _RecipeAddScreenState extends State<RecipeAddScreen> {
                 label: 'Protein',
               ),
               _NutritionChip(
-                value: hasIngredients ? totalCarbs.toStringAsFixed(1) : '—',
+                value: hasIngredients
+                    ? totalCarbs.toStringAsFixed(1)
+                    : '—',
                 label: 'Carbs',
               ),
               _NutritionChip(
-                value: hasIngredients ? totalFats.toStringAsFixed(1) : '—',
+                value: hasIngredients
+                    ? totalFats.toStringAsFixed(1)
+                    : '—',
                 label: 'Fats',
               ),
             ],
@@ -517,9 +523,10 @@ class _NutritionChip extends StatelessWidget {
               )),
           const SizedBox(height: 2),
           Text(label,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                fontSize: 11,
-              )),
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyMedium
+                  ?.copyWith(fontSize: 11)),
         ],
       ),
     );
@@ -543,7 +550,8 @@ class _IngredientSelectorModal extends StatefulWidget {
       _IngredientSelectorModalState();
 }
 
-class _IngredientSelectorModalState extends State<_IngredientSelectorModal> {
+class _IngredientSelectorModalState
+    extends State<_IngredientSelectorModal> {
 
   late List<Ingredient> _filtered;
 
@@ -652,7 +660,8 @@ class _IngredientSelectorModalState extends State<_IngredientSelectorModal> {
                     itemBuilder: (context, index) {
                       final ingredient = _filtered[index];
                       return GestureDetector(
-                        onTap: () => widget.onIngredientSelected(ingredient),
+                        onTap: () =>
+                            widget.onIngredientSelected(ingredient),
                         child: Container(
                           decoration: BoxDecoration(
                             color: Theme.of(context).colorScheme.surface,
@@ -663,14 +672,12 @@ class _IngredientSelectorModalState extends State<_IngredientSelectorModal> {
                             children: [
                               Expanded(
                                 flex: 3,
-                                child: ClipRRect(
+                                child: SmartImage(
+                                  imagePath: ingredient.imagePath,
+                                  placeholder:
+                                      'assets/images/placeholder_ingredient.png',
                                   borderRadius: const BorderRadius.vertical(
                                     top: Radius.circular(16),
-                                  ),
-                                  child: Image.asset(
-                                    ingredient.imagePath ??
-                                        'assets/images/placeholder_ingredient.png',
-                                    fit: BoxFit.cover,
                                   ),
                                 ),
                               ),
