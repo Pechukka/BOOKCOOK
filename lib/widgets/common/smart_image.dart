@@ -19,45 +19,74 @@ class SmartImage extends StatelessWidget {
     this.borderRadius,
   });
 
-  @override
-  Widget build(BuildContext context) {
-    Widget image;
-
+  // Construye el widget de imagen correcto según el tipo de path
+  Widget _buildImage() {
     if (imagePath == null || imagePath!.isEmpty) {
-      image = Image.asset(placeholder, fit: fit);
+      return Image.asset(
+        placeholder,
+        fit: fit,
+        // width/height infinity para que rellene el padre
+        width: width ?? double.infinity,
+        height: height,
+      );
+    }
 
-    } else if (imagePath!.startsWith('http')) {
-      image = Image.network(
+    if (imagePath!.startsWith('http')) {
+      return Image.network(
         imagePath!,
         fit: fit,
-        errorBuilder: (_, __, ___) =>
-            Image.asset(placeholder, fit: fit),
+        width: width ?? double.infinity,
+        height: height,
+        errorBuilder: (_, __, ___) => Image.asset(
+          placeholder,
+          fit: fit,
+          width: width ?? double.infinity,
+          height: height,
+        ),
         loadingBuilder: (_, child, progress) {
           if (progress == null) return child;
           return Container(
             color: Colors.grey.shade200,
+            width: width ?? double.infinity,
+            height: height,
             child: const Center(child: CircularProgressIndicator()),
           );
         },
       );
-
-    } else {
-      final file = File(imagePath!);
-      image = file.existsSync()
-          ? Image.file(file, fit: fit)
-          : Image.asset(placeholder, fit: fit);
     }
 
-    Widget result = SizedBox(
+    // Ruta local
+    final file = File(imagePath!);
+    if (file.existsSync()) {
+      return Image.file(
+        file,
+        fit: fit,
+        width: width ?? double.infinity,
+        height: height,
+      );
+    }
+
+    // Si el archivo local no existe mostramos placeholder
+    return Image.asset(
+      placeholder,
+      fit: fit,
+      width: width ?? double.infinity,
       height: height,
-      width: width,
-      child: image,
     );
+  }
 
+  @override
+  Widget build(BuildContext context) {
+    final image = _buildImage();
+
+    // Si hay borderRadius la aplicamos con ClipRRect
     if (borderRadius != null) {
-      result = ClipRRect(borderRadius: borderRadius!, child: result);
+      return ClipRRect(
+        borderRadius: borderRadius!,
+        child: image,
+      );
     }
 
-    return result;
+    return image;
   }
 }

@@ -349,11 +349,14 @@ class _RecipeAddScreenState extends State<RecipeAddScreen> {
                   ],
                 ),
               ),
+
+              // Campo de cantidad — ahora con label "g / ml"
               SizedBox(
-                width: 80,
+                width: 90,
                 child: TextField(
+                  keyboardType: TextInputType.number,
                   decoration: const InputDecoration(
-                    hintText: 'Qty',
+                    hintText: 'g / ml',
                     contentPadding:
                         EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                   ),
@@ -433,16 +436,19 @@ class _RecipeAddScreenState extends State<RecipeAddScreen> {
   }
 
   Widget _buildNutritionPreview(BuildContext context) {
+    // Calculamos igual que el modelo — proporción por cantidad
     double totalCalories = 0;
     double totalProtein = 0;
     double totalCarbs = 0;
     double totalFats = 0;
 
     for (final ri in _selectedIngredients) {
-      totalCalories += ri.ingredient.calories;
-      totalProtein += ri.ingredient.protein;
-      totalCarbs += ri.ingredient.carbs;
-      totalFats += ri.ingredient.fats;
+      // Si no hay cantidad usamos 100g como base
+      final qty = double.tryParse(ri.quantity) ?? 100;
+      totalCalories += ri.ingredient.calories * qty / 100;
+      totalProtein  += ri.ingredient.protein  * qty / 100;
+      totalCarbs    += ri.ingredient.carbs    * qty / 100;
+      totalFats     += ri.ingredient.fats     * qty / 100;
     }
 
     final hasIngredients = _selectedIngredients.isNotEmpty;
@@ -462,7 +468,7 @@ class _RecipeAddScreenState extends State<RecipeAddScreen> {
                   .headlineLarge
                   ?.copyWith(fontSize: 15)),
           const SizedBox(height: 4),
-          Text('Estimated values based on ingredients',
+          Text('Calculated from quantities entered',
               style: Theme.of(context).textTheme.bodyMedium),
           const SizedBox(height: 16),
           Row(

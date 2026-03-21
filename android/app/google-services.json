@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1023968018806",
+    "project_id": "bookcook-2f314",
+    "storage_bucket": "bookcook-2f314.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1023968018806:android:70ce5d1bccd70fcbbf7a57",
+        "android_client_info": {
+          "package_name": "com.example.book_cook"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCRDK2VdbAw_GTZdyYHOcAGLswy-tlJn6I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

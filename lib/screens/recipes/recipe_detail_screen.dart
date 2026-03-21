@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import '../../app/routes.dart';
 import '../../models/recipe.dart';
+import '../../services/recipe_service.dart';
 import '../../widgets/common/custom_app_bar.dart';
 import '../../widgets/common/smart_image.dart';
 
@@ -29,10 +31,64 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen>
     super.dispose();
   }
 
+  void _showDeleteConfirmation() {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        title: const Text('Delete recipe'),
+        content: Text(
+          'Are you sure you want to delete "${_recipe.name}"? '
+          'This action cannot be undone.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              'Cancel',
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.primary,
+              ),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              await RecipeService.instance.delete(_recipe.id);
+              if (context.mounted) {
+                Navigator.pop(context); // cierra el diálogo
+                Navigator.pop(context); // vuelve al listado
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red.shade400,
+              minimumSize: Size.zero,
+              padding: const EdgeInsets.symmetric(
+                horizontal: 20,
+                vertical: 10,
+              ),
+            ),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const CustomAppBar(title: 'BookCook'),
+
+      // PAPELERA
+      floatingActionButton: FloatingActionButton(
+        onPressed: _showDeleteConfirmation,
+        backgroundColor: Colors.red.shade400,
+        mini: true,
+        child: const Icon(Icons.delete_outline_rounded, color: Colors.white),
+      ),
+
       body: Column(
         children: [
           _RecipeImage(imagePath: _recipe.imagePath),
@@ -62,6 +118,7 @@ class _RecipeImage extends StatelessWidget {
       placeholder: 'assets/images/placeholder_recipe.png',
       height: 220,
       width: double.infinity,
+      fit: BoxFit.cover,
     );
   }
 }

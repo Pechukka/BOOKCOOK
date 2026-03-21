@@ -1,5 +1,5 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
-import '../common/smart_image.dart';
 
 class RecipeCard extends StatelessWidget {
   final String name;
@@ -12,6 +12,16 @@ class RecipeCard extends StatelessWidget {
     this.imagePath,
     this.onTap,
   });
+
+  ImageProvider _resolveImage() {
+    if (imagePath == null || imagePath!.isEmpty) {
+      return const AssetImage('assets/images/placeholder_recipe.png');
+    }
+    if (imagePath!.startsWith('http')) {
+      return NetworkImage(imagePath!);
+    }
+    return FileImage(File(imagePath!));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,11 +44,16 @@ class RecipeCard extends StatelessWidget {
           children: [
             Expanded(
               flex: 3,
-              child: SmartImage(
-                imagePath: imagePath,
-                placeholder: 'assets/images/placeholder_recipe.png',
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(16),
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(16),
+                  ),
+                  image: DecorationImage(
+                    image: _resolveImage(),
+                    fit: BoxFit.cover,
+                    onError: (_, __) {},
+                  ),
                 ),
               ),
             ),
