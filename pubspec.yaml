@@ -9,7 +9,6 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  shared_preferences: ^2.5.5
   firebase_core: ^4.7.0
   firebase_auth: ^6.4.0
   cloud_firestore: ^6.3.0
@@ -22,9 +21,8 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
-  flutter_launcher_icons: ^0.14.4  # ← añade esta línea
+  flutter_launcher_icons: ^0.14.4
 
-# Añade esto AL FINAL del pubspec.yaml
 flutter_launcher_icons:
   android: true
   ios: true

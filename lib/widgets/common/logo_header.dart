@@ -5,12 +5,9 @@ import 'package:flutter/material.dart';
 class LogoHeader extends StatelessWidget {
   final String subtitle;
 
-  final bool darkBackground;
-
   const LogoHeader({
     super.key,
     required this.subtitle,
-    this.darkBackground = false,
   });
 
   @override
@@ -21,9 +18,7 @@ class LogoHeader extends StatelessWidget {
 
         // LOGO
         Image.asset(
-          darkBackground
-              ? 'assets/images/logo_white.png'
-              : 'assets/images/logo_brown.png',
+          'assets/images/logo_brown.png',
           width: 90,
           height: 90,
           fit: BoxFit.contain,
