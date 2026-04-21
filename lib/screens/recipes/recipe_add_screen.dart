@@ -242,7 +242,7 @@ class _RecipeAddScreenState extends State<RecipeAddScreen> {
           color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
           ),
         ),
         child: _selectedImage != null
@@ -262,7 +262,7 @@ class _RecipeAddScreenState extends State<RecipeAddScreen> {
                       color: Theme.of(context)
                           .colorScheme
                           .primary
-                          .withOpacity(0.5)),
+                        .withValues(alpha: 0.5)),
                   const SizedBox(height: 8),
                   Text('Add recipe photo',
                       style: Theme.of(context).textTheme.bodyMedium),
@@ -371,7 +371,7 @@ class _RecipeAddScreenState extends State<RecipeAddScreen> {
                     color: Theme.of(context)
                         .colorScheme
                         .primary
-                        .withOpacity(0.5)),
+                    .withValues(alpha: 0.5)),
               ),
             ],
           ),
@@ -426,7 +426,7 @@ class _RecipeAddScreenState extends State<RecipeAddScreen> {
                       color: Theme.of(context)
                           .colorScheme
                           .primary
-                          .withOpacity(0.5)),
+                        .withValues(alpha: 0.5)),
                 ),
               ),
           ],
@@ -517,7 +517,7 @@ class _NutritionChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.primary.withOpacity(0.08),
+        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -630,7 +630,7 @@ class _IngredientSelectorModalState
                             color: Theme.of(context)
                                 .colorScheme
                                 .primary
-                                .withOpacity(0.3)),
+                            .withValues(alpha: 0.3)),
                         const SizedBox(height: 12),
                         Text(
                           widget.ingredients.isEmpty

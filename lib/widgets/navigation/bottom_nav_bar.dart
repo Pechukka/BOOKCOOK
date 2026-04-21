@@ -25,7 +25,7 @@ class BottomNavBar extends StatelessWidget {
 
       backgroundColor: surface,
       selectedItemColor: primary,
-      unselectedItemColor: primary.withOpacity(0.4),
+      unselectedItemColor: primary.withValues(alpha: 0.4),
       type: BottomNavigationBarType.fixed,
       selectedFontSize: 12,
       unselectedFontSize: 12,

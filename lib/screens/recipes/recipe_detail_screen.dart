@@ -54,11 +54,11 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen>
           ),
           ElevatedButton(
             onPressed: () async {
+              final navigator = Navigator.of(context);
               await RecipeService.instance.delete(_recipe.id);
-              if (context.mounted) {
-                Navigator.pop(context); // cierra el diálogo
-                Navigator.pop(context); // vuelve al listado
-              }
+              if (!mounted) return;
+              navigator.pop(); // cierra el diálogo
+              navigator.pop(); // vuelve al listado
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.red.shade400,
@@ -346,7 +346,7 @@ class _NutritionHighlight extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(

@@ -45,9 +45,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   // Títulos del AppBar según la pestaña activa
-  String get _currentTitle =>
-      _currentIndex == 0 ? 'Recipes' : 'Ingredients';
-
   @override
   Widget build(BuildContext context) {
     if (!_initialized) {
