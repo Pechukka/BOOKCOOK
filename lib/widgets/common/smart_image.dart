@@ -37,7 +37,7 @@ class SmartImage extends StatelessWidget {
         fit: fit,
         width: width ?? double.infinity,
         height: height,
-        errorBuilder: (_, __, ___) => Image.asset(
+        errorBuilder: (_, _, _) => Image.asset(
           placeholder,
           fit: fit,
           width: width ?? double.infinity,

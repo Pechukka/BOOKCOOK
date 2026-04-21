@@ -9,20 +9,20 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  shared_preferences: ^2.2.2
-  firebase_core: ^2.24.2
-  firebase_auth: ^4.16.0
-  cloud_firestore: ^4.14.0
-  mobile_scanner: ^5.1.1   # cámara y lector de código de barras
-  http: ^1.2.1              # llamadas a la API
-  image_picker: ^1.0.7
+  shared_preferences: ^2.5.5
+  firebase_core: ^4.7.0
+  firebase_auth: ^6.4.0
+  cloud_firestore: ^6.3.0
+  mobile_scanner: ^7.2.0   # cámara y lector de código de barras
+  http: ^1.6.0              # llamadas a la API
+  image_picker: ^1.2.1
 
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^5.0.0
-  flutter_launcher_icons: ^0.13.1  # ← añade esta línea
+  flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.14.4  # ← añade esta línea
 
 # Añade esto AL FINAL del pubspec.yaml
 flutter_launcher_icons:

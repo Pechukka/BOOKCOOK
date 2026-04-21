@@ -52,7 +52,7 @@ class RecipeCard extends StatelessWidget {
                   image: DecorationImage(
                     image: _resolveImage(),
                     fit: BoxFit.cover,
-                    onError: (_, __) {},
+                    onError: (_, _) {},
                   ),
                 ),
               ),
