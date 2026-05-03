@@ -42,23 +42,23 @@ class RecipeCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Expanded(
-              flex: 3,
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(16),
-                  ),
-                  image: DecorationImage(
-                    image: _resolveImage(),
-                    fit: BoxFit.cover,
-                    onError: (_, _) {},
-                  ),
+            AspectRatio(
+              aspectRatio: 1 / 1,
+              child: ClipRRect(
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(16),
+                ),
+                child: Image(
+                  image: _resolveImage(),
+                  fit: BoxFit.cover,
+                  alignment: (imagePath == null || imagePath!.isEmpty)
+                      ? Alignment.centerLeft
+                      : Alignment.center,
+                  errorBuilder: (_, __, ___) => const SizedBox.shrink(),
                 ),
               ),
             ),
             Expanded(
-              flex: 2,
               child: Padding(
                 padding: const EdgeInsets.all(10),
                 child: Center(

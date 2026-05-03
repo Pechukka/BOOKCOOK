@@ -1,3 +1,4 @@
+import '../models/ingredient.dart';
 import '../models/recipe.dart';
 import 'firestore_service.dart';
 
@@ -15,6 +16,59 @@ class RecipeService {
   Future<void> init() async {
     final maps = await _firestore.getAll(_collection);
     _recipes = maps.map((m) => Recipe.fromMap(m)).toList();
+
+    // MOCK RECIPE PARA PRUEBAS
+    if (!_recipes.any((r) => r.id == 'mock_recipe_1')) {
+      final r1 = Recipe(
+        id: 'mock_recipe_1',
+        name: 'Receta de Prueba (Test)',
+        ingredients: const [
+          RecipeIngredient(
+            ingredient: Ingredient(
+              id: 'mock_ing_1',
+              name: 'Ingrediente 1 (Test)',
+              brand: 'Mock Brand',
+              calories: 120,
+              protein: 5,
+              carbs: 20,
+              fats: 2,
+            ),
+            quantity: '100',
+          ),
+          RecipeIngredient(
+            ingredient: Ingredient(
+              id: 'mock_ing_2',
+              name: 'Ingrediente 2 (Test)',
+              brand: 'Mock Brand',
+              calories: 250,
+              protein: 15,
+              carbs: 10,
+              fats: 18,
+            ),
+            quantity: '50',
+          ),
+          RecipeIngredient(
+            ingredient: Ingredient(
+              id: 'mock_ing_3',
+              name: 'Ingrediente 3 (Test)',
+              brand: 'Mock Brand',
+              calories: 80,
+              protein: 2,
+              carbs: 15,
+              fats: 1,
+            ),
+            quantity: '200',
+          ),
+        ],
+        steps: const [
+          'Paso 1: Mezclar el Ingrediente 1 y el Ingrediente 2 en un bol grande.',
+          'Paso 2: Añadir poco a poco el Ingrediente 3 mientras se remueve constantemente.',
+          'Paso 3: Servir frío. ¡A disfrutar!'
+        ],
+      );
+      _recipes.add(r1);
+      await _persist(r1);
+    }
   }
 
   Future<void> _persist(Recipe recipe) async {

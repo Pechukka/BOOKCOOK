@@ -13,10 +13,52 @@ class IngredientService {
 
   List<Ingredient> _ingredients = [];
 
-  // ── INIT ──
   Future<void> init() async {
     final maps = await _firestore.getAll(_collection);
     _ingredients = maps.map((m) => Ingredient.fromMap(m)).toList();
+
+    // MOCK INGREDIENTS PARA PRUEBAS
+    if (!_ingredients.any((i) => i.id == 'mock_ing_1')) {
+      final i1 = const Ingredient(
+        id: 'mock_ing_1',
+        name: 'Ingrediente 1 (Test)',
+        brand: 'Mock Brand',
+        calories: 120,
+        protein: 5,
+        carbs: 20,
+        fats: 2,
+      );
+      _ingredients.add(i1);
+      await _persist(i1);
+    }
+
+    if (!_ingredients.any((i) => i.id == 'mock_ing_2')) {
+      final i2 = const Ingredient(
+        id: 'mock_ing_2',
+        name: 'Ingrediente 2 (Test)',
+        brand: 'Mock Brand',
+        calories: 250,
+        protein: 15,
+        carbs: 10,
+        fats: 18,
+      );
+      _ingredients.add(i2);
+      await _persist(i2);
+    }
+
+    if (!_ingredients.any((i) => i.id == 'mock_ing_3')) {
+      final i3 = const Ingredient(
+        id: 'mock_ing_3',
+        name: 'Ingrediente 3 (Test)',
+        brand: 'Mock Brand',
+        calories: 80,
+        protein: 2,
+        carbs: 15,
+        fats: 1,
+      );
+      _ingredients.add(i3);
+      await _persist(i3);
+    }
   }
 
   // ── PERSISTIR ──
